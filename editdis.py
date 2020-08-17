@@ -10,3 +10,9 @@ def diff(src, trg):
     se = StringEdit(src, trg)
     text = se.generate_text(truncate=True)
     print(text)
+    total = len(trg)
+    error = 0
+    for ed in se._edit_list:
+        if ed[0] != 'equal':
+            error += 1
+    return error/total

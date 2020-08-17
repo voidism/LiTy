@@ -1,15 +1,31 @@
 import re
+import os
 import sys
 import json
 import tqdm
+import time
+import readline
 import threading
+
 from playsound import Player
 from editdis import diff
 
+readline.parse_and_bind('tab: complete')
+readline.parse_and_bind('set editing-mode vi')
+
 class Dictation():
-    def __init__(self, audio_file, align_file):
+    def __init__(self, audio_file, align_file, log_file=None):
         self.player = Player(audio_file)
         self.align = json.load(open(align_file))
+        self.audio_name = audio_file
+        if log_file is not None:
+            if not os.path.exists(log_file):
+                self.log_file = open(log_file, 'w')
+                self.log_file.write("Time\tAudio\tNumber\tWER\tHypothesis\tTarget\n")
+            else:
+                self.log_file = open(log_file, 'a')
+        else:
+            self.log_file = None
         self.remove_words = "&[]:;—,“”"
         self.sents = []
         w_index = 0
@@ -64,6 +80,9 @@ class Dictation():
             _ = input("\nStart Sentence [%d] (press to continue)"%(i+1))
             t = threading.Thread(target=self.player.play_seg, args=[start, end, 1000]).start()
             text = input("Type Your Answer >>> ")
-            diff(text, sent)
-            _ = input("(press to continue)")
+            wer = diff(text.lower(), sent.lower())
+            if self.log_file is not None:
+                timestamp = time.strftime("%Y/%m/%d %H:%M:%S", time.localtime(time.time()))
+                self.log_file.write("%s\t%s\t%d\t%.6f\t%s\t%s\n"%(timestamp, self.audio_name, i, wer, text.lower(), sent.lower()))
+            _ = input("WER: {:.2f} % (press to continue)".format(wer*100))
             self.player.stop_sign = 1
