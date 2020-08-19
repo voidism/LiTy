@@ -21,7 +21,7 @@ class Dictation():
         if log_file is not None:
             if not os.path.exists(log_file):
                 self.log_file = open(log_file, 'w')
-                self.log_file.write("Time\tAudio\tNumber\tWER\tHypothesis\tTarget\n")
+                self.log_file.write("Time\tAudio\tNumber\tWER\tWords/ListenIter\tHypothesis\tTarget\n")
             else:
                 self.log_file = open(log_file, 'a')
         else:
@@ -77,12 +77,15 @@ class Dictation():
         for i, (start, end, sent) in enumerate(self.sents):
             if i < begin:
                 continue
-            _ = input("\nStart Sentence [%d] (press to continue)"%(i+1))
+            _ = input("\nStart Sentence [%d/%d] (press to continue)"%(i+1, len(self.sents)))
             t = threading.Thread(target=self.player.play_seg, args=[start, end, 1000]).start()
             text = input("Type Your Answer >>> ")
             wer = diff(text.lower(), sent.lower())
+            n_iter = self.player.n_iter
+            words = len(text.split(' '))
+            wordrate = words/n_iter
             if self.log_file is not None:
                 timestamp = time.strftime("%Y/%m/%d %H:%M:%S", time.localtime(time.time()))
-                self.log_file.write("%s\t%s\t%d\t%.6f\t%s\t%s\n"%(timestamp, self.audio_name, i, wer, text.lower(), sent.lower()))
-            _ = input("WER: {:.2f} % (press to continue)".format(wer*100))
+                self.log_file.write("%s\t%s\t%d\t%.6f\t%.6f\t%s\t%s\n"%(timestamp, self.audio_name, i, wer, wordrate, text.lower(), sent.lower()))
+            _ = input("WER: {:.2f} % Words/ListenIter: {:.4f} (press to continue)".format(wer*100, wordrate))
             self.player.stop_sign = 1
