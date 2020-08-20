@@ -30,6 +30,9 @@ class Player():
 
             stream.close()
             self.n_iter += 1
+            if self.stop_sign:
+                self.stop_sign = 0
+                break
             time.sleep(self.pause_time)
             if self.stop_sign:
                 self.stop_sign = 0

@@ -19,5 +19,6 @@ if __name__ == "__main__":
     if not os.path.exists(args.align):
         print("Forced alignment results not found in {} => Execute aligner specified  in `--gentle_root`".format(args.align))
         print(os.popen("python {} {} {} -o {}".format(os.path.join(args.gentle_root, 'align.py'), args.audio, args.trans, args.align)).read())
+    print(open('logo').read())
     dic = Dictation(args.audio, args.align, args.log, args.pause_time)
     dic.run(args.begin)
