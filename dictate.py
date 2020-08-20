@@ -76,7 +76,7 @@ class Dictation():
 
     def run(self, begin=0):
         for i, (start, end, sent) in enumerate(self.sents):
-            if i < begin:
+            if i+1 < begin:
                 continue
             try:
                 _ = input("\nStart Sentence [%d/%d] (press to continue)"%(i+1, len(self.sents)))

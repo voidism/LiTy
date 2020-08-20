@@ -9,7 +9,7 @@ if __name__ == "__main__":
     parser.add_argument("--align", type=str, default="", required=False, help="The input align file name.")
     parser.add_argument("--begin", type=int, default=0, required=False, help="The begining sentence number.")
     parser.add_argument("--log", type=str, default=None, required=False, help="The log file name.")
-    parser.add_argument("--gentle_root", type=str, default='gentle', required=False, help="The log file name.")
+    parser.add_argument("--gentle_root", type=str, default='gentle', required=False, help="The installed gentle directory.")
     parser.add_argument("--pause_time", type=float, default=2.5, required=False, help="The pause time between each mp3 replay. (sec)")
     args = parser.parse_args()
     if args.align == "":
