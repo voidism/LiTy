@@ -1,3 +1,4 @@
 pydub
+pyaudio
 tqdm
 python-Levenshtein
