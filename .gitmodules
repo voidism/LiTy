@@ -1,0 +1,3 @@
+[submodule "gentle"]
+	path = gentle
+	url = git@github.com:lowerquality/gentle.git

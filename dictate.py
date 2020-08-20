@@ -7,15 +7,15 @@ import time
 import readline
 import threading
 
-from playsound import Player
+from pydubsound import Player
 from editdis import diff
 
 readline.parse_and_bind('tab: complete')
 readline.parse_and_bind('set editing-mode vi')
 
 class Dictation():
-    def __init__(self, audio_file, align_file, log_file=None):
-        self.player = Player(audio_file)
+    def __init__(self, audio_file, align_file, log_file=None, pause_time=2.5):
+        self.player = Player(audio_file, pause_time=pause_time)
         self.align = json.load(open(align_file))
         self.audio_name = audio_file
         if log_file is not None:
@@ -41,7 +41,6 @@ class Dictation():
             times = []
             for word in sent.split(' '):
                 if self.align['words'][w_index]['word'] == word:
-                    #print(self.align['words'][w_index]['word'], "<+>", word)
                     if 'start' in self.align['words'][w_index]:
                         times.append([self.align['words'][w_index]['start'], self.align['words'][w_index]['end']])
                     elif len(times)>0:
@@ -56,7 +55,6 @@ class Dictation():
                         if w_index+n >= len(self.align['words']):
                             break
                         if self.align['words'][w_index+n]['word'] == word:
-                            #print(self.align['words'][w_index+n]['word'], "<+>", word)
                             w_index += n
                             if 'start' in self.align['words'][w_index]:
                                 times.append([self.align['words'][w_index]['start'], self.align['words'][w_index]['end']])
@@ -69,11 +67,13 @@ class Dictation():
                             w_index += 1
                             break
             self.sents.append([times[0][0], times[-1][-1], sent])
+
     def play(self):
         for start, end, sent in self.sents:
             print(sent)
             self.player.play_seg(start, end)
-    def dictate(self, begin=0):
+
+    def run(self, begin=0):
         for i, (start, end, sent) in enumerate(self.sents):
             if i < begin:
                 continue
