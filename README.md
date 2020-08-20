@@ -20,7 +20,7 @@ An Efficient Dictation Training Tool for English Learners.
 
 ## Setup
 
-### Install
+### Install gentle:
 
 Install submodule [gentle](https://github.com/lowerquality/gentle):
 
@@ -31,7 +31,12 @@ cd gentle
 
 > If you have installed gentle before, skip this step. Just set `--gentle_root` to the existing directory of gentle when running `python main.py`.
 
-Install required packages:
+### Install required packages:
+
+- pydub
+- pyaudio
+- tqdm
+- python-Levenshtein
 
 ```
 pip install -r requirements.txt
