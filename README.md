@@ -2,9 +2,14 @@
 
 An Efficient Dictation Training Tool for English Learners.
 
-## Example
+## Features
+- Support any MP3 file with a transcript.
+- Segment audio file automatically into sentences by **forced alignment**.
+- Play segments again and again until you complete the whole sentence.
+- Visualize the errors in your answer.
+- Record statistics (error rate, speed) for personal reviewing.
 
-Quick example:
+## Example
 
 ![usage](https://i.imgur.com/nkijuMB.gif)
 
