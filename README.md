@@ -2,6 +2,8 @@
 
 An Efficient Dictation Training Tool for English Learners.
 
+Train your "human brain speech recognition".
+
 ## Features
 - Support any MP3 file with a transcript.
 - Segment audio file automatically into sentences by **forced alignment**.
