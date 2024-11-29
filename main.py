@@ -64,7 +64,7 @@ if __name__ == "__main__":
     parser.add_argument("--pause_time", type=float, default=2.5, required=False, help="the pause time in seconds between each audio replay.")
     parser.add_argument("--char_per_sent", type=int, default=100, required=False, help="number of maximum characters should be included in a sentence.")
     parser.add_argument("--openai_key", type=str, default=None, required=False, help="the OpenAI API key. (optional. if not provided, the explanation function will be disabled.)")
-    parser.add_argument("--lang", type=str, default='en', required=False, help="the language of the GPT-4o explanation. options: en, zh.")
+    parser.add_argument("--lang", type=str, default='en', required=False, help="the language of the GPT-4o explanation. supported languages are English (`en`), Chinese (`zh`), Spanish (`es`) and French (`fr`).")
     args = parser.parse_args()
     # start downloading and segmenting the video
     audio_path, subtitle_path = download(args.link, args.data_dir)

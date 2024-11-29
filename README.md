@@ -7,11 +7,11 @@ Train your "human brain speech recognition".
 Note: If you need the previous version that supports MP3 audio files with transcripts and forced alignment, please check out the commit [711f824](https://github.com/voidism/LiTy/tree/711f824a9fb799196f0ddc46ad3518191ad4a922). The current version is more user-friendly and supports any YouTube video with subtitles. No need to install gentle and run forced alignment anymore.
 
 ## Features
-- Support any YouTube video with subtitles.
+- Support any YouTube video with subtitles. Tested mainly on English videos but should work for other languages.
 - Play segments again and again until you complete the whole sentence.
 - Visualize the errors in your answer.
 - Record statistics (error rate, speed) for personal reviewing.
-- Provide explanations for the sentence via GPT-4o (OpenAI API required).
+- Provide explanations for the sentence via GPT-4o (OpenAI API required) in English, Chinese, Spanish and French.
 
 ## Example
 
@@ -37,6 +37,14 @@ Note: If you need the previous version that supports MP3 audio files with transc
 pip install -r requirements.txt
 ```
 
+### if Mac OS
+
+You may need to install `portaudio` before installing `pyaudio`.
+
+```
+brew install portaudio
+```
+
 ## Usage
 
 ```
@@ -57,7 +65,8 @@ options:
                         number of maximum characters should be included in a sentence.
   --openai_key OPENAI_KEY
                         the OpenAI API key. (optional. if not provided, the explanation function will be disabled.)
-  --lang LANG           the language of the GPT-4o explanation. options: en, zh.
+  --lang LANG           the language of the GPT-4o explanation. supported languages are English (`en`), Chinese (`zh`), Spanish (`es`)
+                        and French (`fr`). (optional. default is `en`)
 ```
 
 ```
@@ -88,7 +97,7 @@ example: python main.py "https://www.youtube.com/watch?v=mfQZJC5HyVo"
   - 🐢: >2.0
   - 🐌: <=2.0
 - We will show the statistics of the occurrence of each emoji when exiting the practice.
-- If you have a OpenAI API key, we can provide the explanation of the sentence via GPT-4o. The explanation will be shown after you submit your answer. The explanation will be in English in default. If you want to use the Chinese explanation, please specify `--lang zh`. Please run `pip install openai` to use this feature.
+- If you have a OpenAI API key, we can provide the explanation of the sentence via GPT-4o. The explanation will be shown after you submit your answer. Please run `pip install openai` to use this feature. The explanation will be in English by default. If you want to use explanation in other languages, please specify `--lang [language code]`. Currently, we only support English (`en`), Chinese (`zh`), Spanish (`es`) and French (`fr`) explanations, but you can add more languages by modifying the prompts in the code (see `gpt4o_prompts` in `dictate.py`).
 
 ## License
 
