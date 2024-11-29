@@ -21,6 +21,7 @@ Note: If you need the previous version that supports MP3 audio files with transc
 - When typing sentences, the audio segment will be played repeatly with a 2.5-second pause time. Your can also specify the pause time.
 - A visualization of edit distance will be shown after submit your answer. This feature are supported by [visedit](https://github.com/ukiuki-satoshi/visedit/). We modified the code of visedit a bit and used [python-Levenshtein](https://github.com/ztane/python-Levenshtein/) to speed up this module.
 - The feedback information will be show and recorded in a log file, including **accuracy** and **word speed per listen iteration**.
+- If you have a OpenAI API key, you can enable the explanation function to make GPT-4o help you understand the sentence.
 
 ## Setup
 
@@ -89,6 +90,6 @@ example: python main.py "https://www.youtube.com/watch?v=mfQZJC5HyVo"
 - We will show the statistics of the occurrence of each emoji when exiting the practice.
 - If you have a OpenAI API key, we can provide the explanation of the sentence via GPT-4o. The explanation will be shown after you submit your answer. The explanation will be in English in default. If you want to use the Chinese explanation, please specify `--lang zh`. Please run `pip install openai` to use this feature.
 
-# License
+## License
 
 MIT
