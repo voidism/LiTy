@@ -2,3 +2,4 @@ pydub
 pyaudio
 tqdm
 python-Levenshtein
+yt-dlp

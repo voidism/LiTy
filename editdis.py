@@ -1,18 +1,15 @@
 from visedit import StringEdit
-import Levenshtein
 
 def diff(src, trg):
-    # if Levenshtein.distance(src, trg) > 100:
-    #     print("difference too much!")
-    #     print("Your:", src)
-    #     print("Gold:", trg)
-    #     return
     se = StringEdit(src, trg)
     text = se.generate_text(truncate=True)
-    print(text)
-    total = len(trg)
-    error = 0
+    colored_src, colored_trg = text.split('\n')
+    print("| Your:", colored_src)
+    print("| Gold:", colored_trg)
+    total = 0
+    corre = 0
     for ed in se._edit_list:
-        if ed[0] != 'equal':
-            error += 1
-    return error/total
+        if ed[0] == 'equal':
+            corre += ed[4] - ed[3]
+        total += ed[4] - ed[3]
+    return corre/total
