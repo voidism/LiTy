@@ -38,10 +38,24 @@ def parse_time_to_seconds(time):
     return int(h) * 3600.0 + int(m) * 60.0 + float(s)
 
 class Dictation():
-    def __init__(self, audio_file, subtitle_file, log_dir=None, pause_time=2.5, char_per_sent=150, offset=0.4):
+    gpt4o_prompt_chinese = '''「任務：用中文解釋正確答案中的比較困難的英文表達」
+以下是一位使用者在聽寫一段英文語音時的答案。他的答案放在Your:之後，正確答案則是在Gold:之後。
+如果正確答案裡面有比較困難的英文表達，請幫忙用中文解釋他們的意思，就算聽寫的結果是正確的，也還是可以解釋，因為使用者不一定清楚知道他們的意思。不過請注意，使用者已經學習英文很久，所以不需要解釋一些比較基本的英文表達。
+如果使用者的答案在某些字詞上有誤，那就更應該解釋這些字詞的意思。不過請注意，如果錯誤的地方是一些可以忽略的，例如we're寫成we are，there's寫成there is，那就忽略，不需要特別解釋了。
+另外由於語音切割不完美的問題，句子結尾的地方使用者的答案可能會有一些不完整，漏掉幾個字，這種情況也可以忽略，除非漏掉的幾個字是特別困難的英文表達。
+回答要盡量簡潔，不需要解釋太多簡單的基礎單字，只需要解釋比較困難的英文表達即可，通常是一些片語或是幾個字合起來的複雜用法。也不需要重複寫**Your:**和**Gold:**了，只需要寫中文解釋就好。開頭結尾也不需要寫額外的廢話，只需要寫中文解釋就好。
+'''
+    gpt4o_prompt_english = '''"Task: Explain the more difficult English expressions in the correct answer."
+Below is a user's answer while transcribing an English audio recording. The user's answer is shown after "Your:", and the correct answer is shown after "Gold:".
+If the correct answer contains more difficult English expressions, please help explain their meaning, even if the transcription is correct, as the user may not necessarily understand them. However, note that the user has been learning English for a long time, so there is no need to explain basic English expressions.
+If the user's answer has errors in certain words or phrases, those words or phrases should be explained. However, if the errors are minor and can be ignored (e.g., "we're" written as "we are," or "there's" written as "there is"), there is no need to point them out.
+Additionally, due to imperfect audio segmentation, the user's answer may sometimes miss a few words at the end of a sentence. These cases can also be ignored unless the missing words involve particularly difficult English expressions.
+Keep your response concise and focus only on explaining the more difficult English expressions, typically phrases or complex usages of a few words together. There is no need to explain simple or basic vocabulary. Also, do not repeat Your: and Gold: in your response. Simply provide the explanations. Avoid adding unnecessary opening or closing remarks; just write the explanations directly.
+'''
+    def __init__(self, audio_file, subtitle_file, log_dir=None, pause_time=2.5, char_per_sent=150, openai_key=None, lang='en'):
         self.player = Player(audio_file, pause_time=pause_time)
         self.audio_name = audio_file
-        self.offset = offset
+        self.offset = 0.4
         video_id = audio_file.split('/')[-1].split('.')[0]
         self.begin = 0
         if log_dir is not None:
@@ -65,15 +79,25 @@ class Dictation():
         self.remove_words = "&[]:;—,“”"
         self.char_per_sent = char_per_sent
         self.sents = self.segment(subtitle_file)
+        self.openai_key = openai_key
+        if self.openai_key is not None:
+            import openai
+            openai.api_key = self.openai_key
+            self.gpt4o_prompt = self.gpt4o_prompt_english if lang == 'en' else self.gpt4o_prompt_chinese
 
     def segment(self, subtitle_path):
         # If the video is already downloaded, but not segmented
+        auto_generated = False
         with open(subtitle_path, 'r') as f:
             subtitles_content = f.readlines()
+            for line in subtitles_content[:10]:
+                if '</c>' in line:
+                    auto_generated = True
+                    break
             sentences = []
             prev_text = 'none'
             curr_block = ''
-            curr_start_time = 0
+            curr_start_time = -1
             curr_end_time = 0
             idx = 0
             while idx < len(subtitles_content):
@@ -82,9 +106,12 @@ class Dictation():
                     start_time, end_time = line.strip().split(' --> ')
                     start_time = parse_time_to_seconds(start_time)
                     end_time = parse_time_to_seconds(end_time)
-                    text = subtitles_content[idx + 2].strip()
-                    text = remove_tags(text)
-                    if curr_start_time == 0:
+                    if auto_generated:
+                        text = subtitles_content[idx + 2].strip()
+                        text = remove_tags(text)
+                    else:
+                        text = subtitles_content[idx + 1].strip()
+                    if curr_start_time == -1:
                         curr_start_time = start_time
                         curr_end_time = end_time
                     if prev_text == text:
@@ -107,7 +134,10 @@ class Dictation():
                         curr_start_time = start_time
                         curr_end_time = end_time
                     prev_text = text
-                    idx += 2
+                    if auto_generated:
+                        idx += 2
+                    else:
+                        idx += 1
                 else:
                     idx += 1
 
@@ -119,11 +149,22 @@ class Dictation():
             segmentations.append((start_time, end_time, sentence['text']))
         return segmentations
 
-
     def play(self):
         for start, end, sent in self.sents:
             print(sent)
             self.player.play_seg(start, end)
+
+    def gpt4o_feedback(self, text):
+        import openai
+        prompt = f"{self.gpt4o_prompt}\n{text}"
+        response = openai.chat.completions.create(
+            model='gpt-4o-2024-05-13',
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": prompt}
+            ]
+        )
+        return response.choices[0].message.content
 
     def run(self):
         t = None
@@ -215,8 +256,14 @@ class Dictation():
             emoji_wordrate_stats[emoji_wordrate] += 1
 
             try:
-                _ = input("| Acc: {}  {:.2f} % Words/ListenIter: {}  {:.4f} (👉 ⌨️🔜 )".format(emoji_acc, acc*100, emoji_wordrate, wordrate))
-
+                if self.openai_key is not None:
+                    print("| Acc: {}  {:.2f} % Words/ListenIter: {}  {:.4f}".format(emoji_acc, acc*100, emoji_wordrate, wordrate))
+                    feedback = self.gpt4o_feedback(f"Your: {text}\nGold: {sent}")
+                    print("| Feedback:")
+                    print('\n'.join([f"| {line}" for line in feedback.split('\n')[:-1] if line.strip() != '']))
+                    _ = input("| {} (👉 ⌨️🔜 )".format(feedback.split('\n')[-1]))
+                else:
+                    _ = input("| Acc: {}  {:.2f} % Words/ListenIter: {}  {:.4f} (👉 ⌨️🔜 )".format(emoji_acc, acc*100, emoji_wordrate, wordrate))
             except:
                 print("\n| *** Exit program ***")
                 # print the statistics of emoji in bar chart

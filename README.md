@@ -11,6 +11,7 @@ Note: If you need the previous version that supports MP3 audio files with transc
 - Play segments again and again until you complete the whole sentence.
 - Visualize the errors in your answer.
 - Record statistics (error rate, speed) for personal reviewing.
+- Provide explanations for the sentence via GPT-4o (OpenAI API required).
 
 ## Example
 
@@ -38,14 +39,14 @@ pip install -r requirements.txt
 ## Usage
 
 ```
-usage: main.py [-h] [--log_dir LOG_DIR] [--data_dir DATA_DIR] [--pause_time PAUSE_TIME]
-               [--char_per_sent CHAR_PER_SENT]
+usage: main.py [-h] [--log_dir LOG_DIR] [--data_dir DATA_DIR] [--pause_time PAUSE_TIME] [--char_per_sent CHAR_PER_SENT]
+               [--openai_key OPENAI_KEY] [--lang LANG]
                link
 
 positional arguments:
   link                  the link of the YouTube video with subtitles.
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   --log_dir LOG_DIR     the folder to save the log file.
   --data_dir DATA_DIR   the folder to save the downloaded data.
@@ -53,6 +54,9 @@ optional arguments:
                         the pause time in seconds between each audio replay.
   --char_per_sent CHAR_PER_SENT
                         number of maximum characters should be included in a sentence.
+  --openai_key OPENAI_KEY
+                        the OpenAI API key. (optional. if not provided, the explanation function will be disabled.)
+  --lang LANG           the language of the GPT-4o explanation. options: en, zh.
 ```
 
 ```
@@ -83,3 +87,8 @@ example: python main.py "https://www.youtube.com/watch?v=mfQZJC5HyVo"
   - 🐢: >2.0
   - 🐌: <=2.0
 - We will show the statistics of the occurrence of each emoji when exiting the practice.
+- If you have a OpenAI API key, we can provide the explanation of the sentence via GPT-4o. The explanation will be shown after you submit your answer. The explanation will be in English in default. If you want to use the Chinese explanation, please specify `--lang zh`. Please run `pip install openai` to use this feature.
+
+# License
+
+MIT
