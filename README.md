@@ -4,7 +4,7 @@
 
 Train your "human brain speech recognition".
 
-Note: If you need the previous version that supports MP3 audio files with transcripts and forced alignment, please check out the commit [711f824](https://github.com/voidism/LiTy/commit/711f824a9fb799196f0ddc46ad3518191ad4a922). The current version is more user-friendly and supports any YouTube video with subtitles. No need to install gentle and run forced alignment anymore.
+Note: If you need the previous version that supports MP3 audio files with transcripts and forced alignment, please check out the commit [711f824](https://github.com/voidism/LiTy/tree/711f824a9fb799196f0ddc46ad3518191ad4a922). The current version is more user-friendly and supports any YouTube video with subtitles. No need to install gentle and run forced alignment anymore.
 
 ## Features
 - Support any YouTube video with subtitles.
